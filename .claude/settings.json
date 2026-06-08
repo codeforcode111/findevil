@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "findevil": {
+      "command": "python",
+      "args": ["-m", "findevil.server"],
+      "cwd": "/Users/jiaweiyu/workfiles/hackthron-june"
+    }
+  }
+}
