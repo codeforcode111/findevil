@@ -1,0 +1,75 @@
+# Incident Response Report
+
+**Generated:** {{ timestamp }}
+**Evidence Integrity:** {{ "PASSED" if integrity else "FAILED" }}
+
+---
+
+## Executive Summary
+
+| Metric | Value |
+|--------|-------|
+| Total Findings | {{ findings | length }} |
+| Confirmed | {{ findings | selectattr("status.value", "equalto", "confirmed") | list | length }} |
+| Probable | {{ findings | selectattr("status.value", "equalto", "probable") | list | length }} |
+| Inferred | {{ findings | selectattr("status.value", "equalto", "inferred") | list | length }} |
+| Refuted | {{ findings | selectattr("status.value", "equalto", "refuted") | list | length }} |
+| Tool Executions | {{ tool_call_count }} |
+| Self-Corrections | {{ correction_count }} |
+
+## Findings
+
+{% for f in findings %}
+### {{ f.finding_id }}: {{ f.claim }}
+
+| Field | Value |
+|-------|-------|
+| Status | **{{ f.status.value | upper }}** |
+| MITRE ATT&CK | {{ f.mitre_technique }} |
+| Confidence Basis | {{ f.confidence_basis }} |
+
+**Evidence:**
+{% for e in f.evidence %}
+- `{{ e.source_file }}` (run: {{ e.tool_run_id }}): {{ e.excerpt }}
+{% endfor %}
+
+{% if f.contradictions %}
+**Contradictions:**
+{% for c in f.contradictions %}
+- `{{ c.source_file }}`: {{ c.excerpt }}
+{% endfor %}
+{% endif %}
+
+{% if f.correction_history %}
+**Correction History:**
+{% for cr in f.correction_history %}
+- {{ cr.correction_type }}: {{ cr.before_status.value }} → {{ cr.after_status.value }} — {{ cr.reason }}
+{% endfor %}
+{% endif %}
+
+---
+
+{% endfor %}
+
+## Evidence Coverage Matrix
+
+| Source | Analyzed | Tools Used |
+|--------|----------|-----------|
+{% for src in evidence_sources %}
+| {{ src.name }} | {{ src.hash[:12] }}... | {{ src.tools | join(", ") if src.tools else "—" }} |
+{% endfor %}
+
+## Negative Findings
+
+Items checked but no malicious activity found:
+{% for nf in negative_findings %}
+- {{ nf }}
+{% endfor %}
+{% if not negative_findings %}
+- _(none recorded)_
+{% endif %}
+
+## Audit Trail
+
+- Hash chain integrity: {{ "VALID" if chain_valid else "INVALID" }}
+- Total events: {{ total_events }}
