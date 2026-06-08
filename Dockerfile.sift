@@ -1,0 +1,31 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    python3 \
+    python3-pip \
+    sleuthkit \
+    yara \
+    libyara-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install \
+    volatility3 \
+    plaso \
+    dfvfs
+
+RUN curl -sSL https://github.com/Yamato-Security/hayabusa/releases/latest/download/hayabusa-linux-x64-gnu.zip -o /tmp/hayabusa.zip \
+    && apt-get update && apt-get install -y unzip \
+    && unzip /tmp/hayabusa.zip -d /opt/hayabusa \
+    && chmod +x /opt/hayabusa/hayabusa \
+    && ln -s /opt/hayabusa/hayabusa /usr/local/bin/hayabusa \
+    && rm /tmp/hayabusa.zip
+
+RUN mkdir -p /evidence /workspace
+
+VOLUME ["/evidence", "/workspace"]
+
+CMD ["tail", "-f", "/dev/null"]

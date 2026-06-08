@@ -1,0 +1,11 @@
+services:
+  sift:
+    container_name: findevil-sift
+    build:
+      context: .
+      dockerfile: Dockerfile.sift
+    volumes:
+      - ./evidence:/evidence:ro
+      - ./workspace:/workspace
+    network_mode: none
+    restart: unless-stopped
