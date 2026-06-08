@@ -1,0 +1,16 @@
+{
+  "case_name": "sample",
+  "description": "Template for ground truth data used in accuracy benchmarking",
+  "expected_findings": [
+    {
+      "claim": "Example: Malicious process persistence via registry Run key",
+      "mitre_technique": "T1547.001",
+      "expected_status": "confirmed",
+      "evidence_types": ["registry", "prefetch", "timeline"]
+    }
+  ],
+  "expected_negative": [
+    "No lateral movement detected",
+    "No data exfiltration confirmed"
+  ]
+}
