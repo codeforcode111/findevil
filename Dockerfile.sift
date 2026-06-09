@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
@@ -26,8 +26,8 @@ RUN ARCH=$(dpkg --print-architecture) && \
     fi && \
     curl -sSL "https://github.com/Yamato-Security/hayabusa/releases/download/v3.9.0/hayabusa-3.9.0-lin-${HAYABUSA_ARCH}-gnu.zip" -o /tmp/hayabusa.zip && \
     unzip /tmp/hayabusa.zip -d /opt/hayabusa && \
-    find /opt/hayabusa -name "hayabusa*" -type f ! -name "*.zip" -exec chmod +x {} \; && \
-    HAYABUSA_BIN=$(find /opt/hayabusa -name "hayabusa*" -type f ! -name "*.txt" ! -name "*.md" ! -name "*.zip" ! -name "*.yml" ! -name "*.yaml" | head -1) && \
+    HAYABUSA_BIN=$(find /opt/hayabusa -maxdepth 1 -name "hayabusa*" -type f | head -1) && \
+    chmod +x "$HAYABUSA_BIN" && \
     ln -sf "$HAYABUSA_BIN" /usr/local/bin/hayabusa && \
     rm /tmp/hayabusa.zip
 

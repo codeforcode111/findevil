@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.sift
     volumes:
-      - ./evidence:/evidence:ro
+      - ./cases/e2e_test:/evidence:ro
       - ./workspace:/workspace
     network_mode: none
     restart: unless-stopped
