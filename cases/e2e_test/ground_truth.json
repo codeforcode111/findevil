@@ -1,0 +1,33 @@
+{
+  "case_name": "windows_compromise_e2e",
+  "description": "Simulated Windows endpoint compromise: Cobalt Strike beacon via phishing, persistence via registry Run key, credential dumping, lateral movement attempt",
+  "expected_findings": [
+    {
+      "claim": "Cobalt Strike beacon process (rundll32.exe with suspicious parent)",
+      "mitre_technique": "T1059.003",
+      "expected_status": "confirmed",
+      "evidence_types": ["memory", "eventlog"]
+    },
+    {
+      "claim": "Registry Run key persistence",
+      "mitre_technique": "T1547.001",
+      "expected_status": "confirmed",
+      "evidence_types": ["registry", "timeline"]
+    },
+    {
+      "claim": "Credential dumping via lsass.exe access",
+      "mitre_technique": "T1003.001",
+      "expected_status": "probable",
+      "evidence_types": ["memory"]
+    },
+    {
+      "claim": "Lateral movement via RDP",
+      "mitre_technique": "T1021.001",
+      "expected_status": "refuted",
+      "evidence_types": ["eventlog"]
+    }
+  ],
+  "expected_negative": [
+    "No data exfiltration confirmed"
+  ]
+}
