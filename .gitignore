@@ -7,3 +7,4 @@ build/
 workspace/
 *.plaso
 *.jsonl
+cases/real_evidence/

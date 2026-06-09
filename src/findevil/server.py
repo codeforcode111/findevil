@@ -82,7 +82,7 @@ def investigate_case(evidence_path: str, workspace_path: str) -> str:
 
     registry = ToolRegistry()
     executor = DockerExecutor(
-        container_name="findevil-tools",
+        container_name="findevil-sift",
         registry=registry,
         ledger=ledger,
     )
