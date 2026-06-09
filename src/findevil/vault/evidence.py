@@ -27,6 +27,9 @@ class EvidenceVault:
                 h.update(chunk)
         return h.hexdigest()
 
+    def _rel_path(self, path: Path) -> str:
+        return str(path.relative_to(self.evidence_dir))
+
     def initialize(self) -> None:
         if not self.evidence_dir.exists():
             raise FileNotFoundError(f"Evidence directory not found: {self.evidence_dir}")
@@ -35,7 +38,7 @@ class EvidenceVault:
         for path in sorted(self.evidence_dir.rglob("*")):
             if path.is_file():
                 file_hash = self._hash_file(path)
-                rel_name = path.name
+                rel_name = self._rel_path(path)
                 self.file_hashes[rel_name] = file_hash
                 self.ledger.append("evidence_hash", {
                     "file": rel_name,
@@ -54,7 +57,8 @@ class EvidenceVault:
         for path in self.evidence_dir.rglob("*"):
             if path.is_file():
                 current_hash = self._hash_file(path)
-                if self.file_hashes.get(path.name) != current_hash:
+                rel = self._rel_path(path)
+                if self.file_hashes.get(rel) != current_hash:
                     return False
         return True
 
@@ -62,11 +66,12 @@ class EvidenceVault:
         files = []
         for path in sorted(self.evidence_dir.rglob("*")):
             if path.is_file():
+                rel = self._rel_path(path)
                 files.append({
                     "name": path.name,
                     "path": str(path),
                     "size": path.stat().st_size,
-                    "hash": self.file_hashes.get(path.name, "unknown"),
+                    "hash": self.file_hashes.get(rel, "unknown"),
                 })
         return files
 
