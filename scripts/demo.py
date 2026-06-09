@@ -120,9 +120,10 @@ def main():
     workspace_dir = PROJECT_ROOT / "workspace"
     workspace_dir.mkdir(exist_ok=True)
 
-    # Clean previous demo artifacts
+    # Clean previous demo artifacts (files only, skip directories)
     for old in workspace_dir.glob("demo_*"):
-        old.unlink()
+        if old.is_file():
+            old.unlink()
 
     audit_path = workspace_dir / "demo_audit.jsonl"
     ledger = AuditLedger(audit_path)
