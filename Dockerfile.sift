@@ -1,28 +1,43 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
 RUN apt-get update && apt-get install -y \
     curl \
-    git \
+    unzip \
     python3 \
     python3-pip \
     sleuthkit \
     yara \
     libyara-dev \
+    perl \
+    libparse-win32registry-perl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install \
-    volatility3 \
-    plaso \
-    dfvfs
+RUN pip3 install volatility3
 
-RUN curl -sSL https://github.com/Yamato-Security/hayabusa/releases/latest/download/hayabusa-linux-x64-gnu.zip -o /tmp/hayabusa.zip \
-    && apt-get update && apt-get install -y unzip \
-    && unzip /tmp/hayabusa.zip -d /opt/hayabusa \
-    && chmod +x /opt/hayabusa/hayabusa \
-    && ln -s /opt/hayabusa/hayabusa /usr/local/bin/hayabusa \
-    && rm /tmp/hayabusa.zip
+# Hayabusa — detect arch and download the correct build
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then \
+      HAYABUSA_ARCH="aarch64"; \
+    else \
+      HAYABUSA_ARCH="x64"; \
+    fi && \
+    curl -sSL "https://github.com/Yamato-Security/hayabusa/releases/download/v3.9.0/hayabusa-3.9.0-lin-${HAYABUSA_ARCH}-gnu.zip" -o /tmp/hayabusa.zip && \
+    unzip /tmp/hayabusa.zip -d /opt/hayabusa && \
+    find /opt/hayabusa -name "hayabusa*" -type f ! -name "*.zip" -exec chmod +x {} \; && \
+    HAYABUSA_BIN=$(find /opt/hayabusa -name "hayabusa*" -type f ! -name "*.txt" ! -name "*.md" ! -name "*.zip" ! -name "*.yml" ! -name "*.yaml" | head -1) && \
+    ln -sf "$HAYABUSA_BIN" /usr/local/bin/hayabusa && \
+    rm /tmp/hayabusa.zip
+
+# RegRipper
+RUN curl -sSL https://github.com/keydet89/RegRipper3.0/archive/refs/heads/master.zip -o /tmp/regripper.zip && \
+    unzip /tmp/regripper.zip -d /opt/ && \
+    mv /opt/RegRipper3.0-master /opt/regripper && \
+    chmod +x /opt/regripper/rip.pl && \
+    ln -s /opt/regripper/rip.pl /usr/local/bin/rip.pl && \
+    rm /tmp/regripper.zip
 
 RUN mkdir -p /evidence /workspace
 
