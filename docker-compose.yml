@@ -5,7 +5,9 @@ services:
       context: .
       dockerfile: Dockerfile.sift
     volumes:
-      - ./cases/real_evidence:/evidence:ro
+      - ./cases/nist_real:/evidence:ro
+      - ./cases/real_evidence:/evidence_evtx:ro
       - ./workspace:/workspace
+      - ./workspace/vol_symbols/windows.zip:/usr/local/lib/python3.12/dist-packages/volatility3/symbols/windows.zip:ro
     network_mode: none
     restart: unless-stopped
